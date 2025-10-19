@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase-client';
 
 const TaskList = () => {
-    // Sample tasks for demonstration
     const [tasks, setTasks] = useState([]);
+    const [editingTask, setEditingTask] = useState(null);
+    const [editForm, setEditForm] = useState({ title: '', description: '' });
 
     useEffect(() => {
         const fetchTasks = async () => {
@@ -12,13 +13,13 @@ const TaskList = () => {
             if (error) {
                 console.error(error);
             } else {
-                setTasks(data);
+                setTasks(data || []);
             }
         };
         fetchTasks();
     }, []);
 
-    const toggleTask = async(id, completed) => {
+    const toggleTask = async (id, completed) => {
         const { data, error } = await supabase.from('tasks').update({ completed: !completed }).eq('id', id).select().single();
         if (error) {
             console.error(error);
@@ -28,12 +29,43 @@ const TaskList = () => {
     };
 
     const deleteTask = async (id) => {
-        const { data, error } = await supabase.from('tasks').delete().eq('id', id).select().single();
+        const { error } = await supabase.from('tasks').delete().eq('id', id);
         if (error) {
             console.error(error);
         } else {
             setTasks(tasks.filter(task => task.id !== id));
         }   
+    };
+
+    const openEditModal = (task) => {
+        setEditingTask(task);
+        setEditForm({ title: task.title, description: task.description });
+    };
+
+    const closeEditModal = () => {
+        setEditingTask(null);
+        setEditForm({ title: '', description: '' });
+    };
+
+    const handleEditSubmit = async (e) => {
+        e.preventDefault();
+        
+        const { data, error } = await supabase
+            .from('tasks')
+            .update({ 
+                title: editForm.title, 
+                description: editForm.description 
+            })
+            .eq('id', editingTask.id)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Error updating task:', error);
+        } else {
+            setTasks(tasks.map(task => task.id === editingTask.id ? data : task));
+            closeEditModal();
+        }
     };
 
     return (
@@ -50,6 +82,13 @@ const TaskList = () => {
                                     <h3 className="task-title">{task.title}</h3>
                                     <div className="task-actions">
                                         <button 
+                                            className="edit-btn"
+                                            onClick={() => openEditModal(task)}
+                                            title="Edit task"
+                                        >
+                                            ✏️
+                                        </button>
+                                        <button 
                                             className="toggle-btn"
                                             onClick={() => toggleTask(task.id, task.completed)}
                                         >
@@ -65,11 +104,53 @@ const TaskList = () => {
                                 </div>
                                 <p className="task-description">{task.description}</p>
                                 <small className="task-date">
-                                    Created: {new Date(task.createdAt).toLocaleDateString()}
+                                    Created: {new Date(task.created_at).toLocaleDateString()}
                                 </small>
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Edit Modal */}
+            {editingTask && (
+                <div className="modal-overlay" onClick={closeEditModal}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>Edit Task</h3>
+                            <button className="close-btn" onClick={closeEditModal}>×</button>
+                        </div>
+                        <form onSubmit={handleEditSubmit}>
+                            <div className="form-group">
+                                <label htmlFor="edit-title">Task Title</label>
+                                <input
+                                    type="text"
+                                    id="edit-title"
+                                    value={editForm.title}
+                                    onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="edit-description">Description</label>
+                                <textarea
+                                    id="edit-description"
+                                    value={editForm.description}
+                                    onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                                    rows={4}
+                                    required
+                                />
+                            </div>
+                            <div className="modal-actions">
+                                <button type="button" className="cancel-btn" onClick={closeEditModal}>
+                                    Cancel
+                                </button>
+                                <button type="submit" className="save-btn">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             )}
         </div>
