@@ -5,27 +5,52 @@ const TaskForm = ({ tasks,setTasks, session }) => {
    const [task, setTask] = useState({
     title: '',
     description: '',
+    image: '',
    });
 
    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        let imagePath = null;
         console.log(session.user.id);
         console.log(typeof session.user.id);
 
-        const { data, error } = await supabase.from('tasks').insert({...task, user: session.user.id}).select().single();
+        if (task.image) {
+            console.log('Task image:', task.image);
+            console.log('Image name:', task.image.name);
+            console.log('Image type:', task.image.type);
+            console.log('Image size:', task.image.size);
+            
+            const fileName = `${new Date().getTime()}-${task.image.name}`;
+
+            const { data: imageData, error: imageError } = await supabase.storage.from('tasks-images').upload(fileName, task.image);
+
+            if (imageError) {
+                return;
+            } else {
+                imagePath = imageData.path;
+            }
+        }
+
+        const { data, error } = await supabase.from('tasks').insert({
+            title: task.title,
+            description: task.description,
+            user: session.user.id,
+            image_url: imagePath
+        }).select().single();
 
         if (error) {
             console.error(error);
         } else {
             console.log('Task created:', data);
+            //We don't need to update the tasks state here because we subscribe to the tasks channel in the TaskManagement component
             // setTasks(prevTasks => {
             //     const newTasks = [...prevTasks];
             //     newTasks.unshift(data);
             //     return newTasks;
             //   });
-            setTask({ title: '', description: '' });
+            setTask({ title: '', description: '', image: '' });
         }
 
 
@@ -56,6 +81,16 @@ const TaskForm = ({ tasks,setTasks, session }) => {
                         placeholder="Enter task description..."
                         rows={4}
                         required
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="image">Image</label>
+                    <input
+                        type="file"
+                        id="image"
+                        accept="image/*"
+                        onChange={(e) => setTask((prev) => ({ ...prev, image: e.target.files[0] }))}
                     />
                 </div>
                 

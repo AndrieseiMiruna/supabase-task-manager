@@ -194,6 +194,24 @@
   font-size: 12px;
 }
 
+/* Task Image Thumbnail */
+.task-image-thumbnail {
+  margin: 8px 0;
+}
+
+.task-thumbnail {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.task-thumbnail:hover {
+  transform: scale(1.05);
+}
+
 /* Edit Button */
 .edit-btn {
   width: 32px;

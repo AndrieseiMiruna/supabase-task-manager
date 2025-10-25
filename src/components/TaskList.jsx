@@ -5,6 +5,7 @@ const TaskList = ({ tasks, setTasks }) => {
    
     const [editingTask, setEditingTask] = useState(null);
     const [editForm, setEditForm] = useState({ title: '', description: '' });
+    const [viewingImage, setViewingImage] = useState(null);
 
    
     const toggleTask = async (id, completed) => {
@@ -34,6 +35,7 @@ const TaskList = ({ tasks, setTasks }) => {
         setEditingTask(null);
         setEditForm({ title: '', description: '' });
     };
+
 
     const handleEditSubmit = async (e) => {
         e.preventDefault();
@@ -93,6 +95,15 @@ const TaskList = ({ tasks, setTasks }) => {
                                     </div>
                                 </div>
                                 <p className="task-description">{task.description}</p>
+                                {task.image_url && (
+                                    <div className="task-image-thumbnail">
+                                        <img 
+                                            src={`${process.env.REACT_APP_SUPABASE_URL}/storage/v1/object/public/tasks-images/${task.image_url}`}
+                                            alt="Task image"
+                                            className="task-thumbnail"
+                                        />
+                                    </div>
+                                )}
                                 <small className="task-date">
                                     Created: {new Date(task.created_at).toLocaleDateString()}
                                 </small>
