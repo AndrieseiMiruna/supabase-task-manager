@@ -4,7 +4,7 @@ import TaskList from './TaskList';
 import { supabase } from '../supabase-client';
 import { useState, useEffect } from 'react';
 
-function TaskManagement() {
+function TaskManagement({session}) {
 
     const [tasks, setTasks] = useState([]);
 
@@ -23,7 +23,7 @@ function TaskManagement() {
 
     return (
         <div className="task-management">
-            <TaskForm tasks={tasks} setTasks={setTasks} />
+            <TaskForm tasks={tasks} setTasks={setTasks} session={session} />
             <TaskList tasks={tasks} setTasks={setTasks} />
         </div>
     );

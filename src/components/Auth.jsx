@@ -55,6 +55,7 @@ export const Auth = ({ setSession }) => {
                     <label htmlFor="password">Password</label>
                     <input type="password" id="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
+                
                 {error && <p className="error-message">{error}</p>}
                 {message && <p className="success-message">{message}</p>}
                 <button disabled={loading} type="submit" className="submit-btn">{isSignUp ? 'Sign Up' : 'Sign In'}</button>

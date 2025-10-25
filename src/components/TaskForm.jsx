@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabase-client';
 
-const TaskForm = ({ tasks,setTasks }) => {
+const TaskForm = ({ tasks,setTasks, session }) => {
    const [task, setTask] = useState({
     title: '',
     description: '',
@@ -11,8 +11,11 @@ const TaskForm = ({ tasks,setTasks }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(session.user.id);
+        console.log(typeof session.user.id);
+        const userId = Number(session.user.id);
 
-        const { data, error } = await supabase.from('tasks').insert(task).select().single();
+        const { data, error } = await supabase.from('tasks').insert({...task, user_id: session.user.id}).select().single();
 
         if (error) {
             console.error(error);

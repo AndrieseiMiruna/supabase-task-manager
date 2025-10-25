@@ -7,13 +7,27 @@ import Header from './components/Header';
 
 function App() {
   const [session, setSession] = useState(null);
+  const fetchSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    setSession(session);
+  };
 
   useEffect(() => {
-    const fetchSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-    };
+
     fetchSession();
+
+    const {data:authListener} = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        setSession(session);
+      } else if (event === 'SIGNED_OUT') {
+        setSession(null);
+      }
+    });
+
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   if (!session) {
@@ -24,7 +38,7 @@ function App() {
     <div className="app">
       <Header setSession={setSession}/>
       <div className="app__container">
-        <TaskManagement />
+        <TaskManagement session={session}/>
       </div>
     </div>
   );
