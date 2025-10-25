@@ -10,8 +10,6 @@ export const Auth = ({ setSession }) => {
     const [loading, setLoading] = useState(false);
 
     const handleSignIn = async () => {
-        setLoading(true);
-        setError('');
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
             setError(error.message);
@@ -22,25 +20,28 @@ export const Auth = ({ setSession }) => {
     };
 
     const handleSignUp = async () => {
-        setLoading(true);
-        setError('');
+       
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) {
             setError(error.message);
         } else{
             setMessage('Account created successfully');
         }
+       
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        setLoading(true);
+        setError('');
         if (isSignUp) {
             
             await handleSignUp();
         } else {
             await handleSignIn();
         }
+
+        setLoading(false);
     };
     return (
         <div className="auth__page">

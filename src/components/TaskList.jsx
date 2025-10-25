@@ -63,8 +63,8 @@ const TaskList = ({ tasks, setTasks }) => {
                 <p className="no-tasks">No tasks yet. Add one above!</p>
             ) : (
                 <div className="tasks-container">
-                    {tasks.map(task => (
-                        <div key={task.id} className={`task-item ${task.completed ? 'completed' : ''}`}>
+                    {tasks.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).map((task, index) => (
+                        <div key={index} className={`task-item ${task.completed ? 'completed' : ''}`}>
                             <div className="task-content">
                                 <div className="task-header">
                                     <h3 className="task-title">{task.title}</h3>

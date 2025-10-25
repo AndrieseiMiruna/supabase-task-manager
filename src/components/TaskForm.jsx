@@ -13,19 +13,18 @@ const TaskForm = ({ tasks,setTasks, session }) => {
         e.preventDefault();
         console.log(session.user.id);
         console.log(typeof session.user.id);
-        const userId = Number(session.user.id);
 
-        const { data, error } = await supabase.from('tasks').insert({...task, user_id: session.user.id}).select().single();
+        const { data, error } = await supabase.from('tasks').insert({...task, user: session.user.id}).select().single();
 
         if (error) {
             console.error(error);
         } else {
             console.log('Task created:', data);
-            setTasks(prevTasks => {
-                const newTasks = [...prevTasks];
-                newTasks.unshift(data);
-                return newTasks;
-              });
+            // setTasks(prevTasks => {
+            //     const newTasks = [...prevTasks];
+            //     newTasks.unshift(data);
+            //     return newTasks;
+            //   });
             setTask({ title: '', description: '' });
         }
 
