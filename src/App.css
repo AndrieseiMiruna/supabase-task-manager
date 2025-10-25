@@ -154,6 +154,7 @@
   color: #6c757d;
 }
 
+
 .task-header {
   display: flex;
   justify-content: space-between;
@@ -190,7 +191,8 @@
   color: #666;
 }
 
-.toggle-btn:hover {
+.toggle-btn:hover,
+.task-item.completed .toggle-btn {
   background: #28a745;
   color: white;
 }

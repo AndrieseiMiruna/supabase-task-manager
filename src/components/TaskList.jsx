@@ -1,24 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { supabase } from '../supabase-client';
 
-const TaskList = () => {
-    const [tasks, setTasks] = useState([]);
+const TaskList = ({ tasks, setTasks }) => {
+   
     const [editingTask, setEditingTask] = useState(null);
     const [editForm, setEditForm] = useState({ title: '', description: '' });
 
-    useEffect(() => {
-        const fetchTasks = async () => {
-            const { data, error } = await supabase.from('tasks').select('*').order('created_at', { ascending: false });
-            
-            if (error) {
-                console.error(error);
-            } else {
-                setTasks(data || []);
-            }
-        };
-        fetchTasks();
-    }, []);
-
+   
     const toggleTask = async (id, completed) => {
         const { data, error } = await supabase.from('tasks').update({ completed: !completed }).eq('id', id).select().single();
         if (error) {
@@ -90,15 +78,17 @@ const TaskList = () => {
                                         </button>
                                         <button 
                                             className="toggle-btn"
+                                            title={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
                                             onClick={() => toggleTask(task.id, task.completed)}
                                         >
-                                            {task.completed ? '✓' : '○'}
+                                            {task.completed ? '✓' : '✓'}
                                         </button>
                                         <button 
                                             className="delete-btn"
                                             onClick={() => deleteTask(task.id)}
+                                            title="Delete task"
                                         >
-                                            ×
+                                            🗑️
                                         </button>
                                     </div>
                                 </div>

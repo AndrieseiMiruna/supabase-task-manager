@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabase-client';
 
-const TaskForm = () => {
+const TaskForm = ({ tasks,setTasks }) => {
    const [task, setTask] = useState({
     title: '',
     description: '',
@@ -18,6 +18,12 @@ const TaskForm = () => {
             console.error(error);
         } else {
             console.log('Task created:', data);
+            setTasks(prevTasks => {
+                const newTasks = [...prevTasks];
+                newTasks.unshift(data);
+                return newTasks;
+              });
+            setTask({ title: '', description: '' });
         }
 
 
